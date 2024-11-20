@@ -1,0 +1,98 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% Linespread command allows you to change line spacing for the entire document
+\linespread{1.18}
+
+% Tweak page margins
+\addtolength{\oddsidemargin}{-.875in}
+\addtolength{\evensidemargin}{-.875in}
+\addtolength{\textwidth}{1.75in}
+
+\addtolength{\topmargin}{-.875in}
+\addtolength{\textheight}{1.75in}
+
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{xspace}
+\usepackage{fancyhdr}
+\hypersetup{
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\newcommand{\Hrule}{\rule{\linewidth}{0.3mm}}
+
+% Project specific macros
+\newcommand{\graphite}{GRAPHITE\xspace}
+\newcommand{\wave}{WAVE\xspace}
+
+% School specific macros
+\newcommand{\schoolShort}{Yale\xspace}
+\newcommand{\school}{Yale\xspace}
+\newcommand{\schoolLong}{Yale University\xspace}
+
+\newcommand{\profOne}{Prof.\ Zhong Shao\xspace}
+\newcommand{\profTwo}{Prof.\ Ruzica Piskac\xspace}
+% \newcommand{\profThree}{Prof.\ Jure Leskovec\xspace}
+
+% Creates header for each page
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\header\hskip\linepagesep\vfootline\thepage}
+\newskip\linepagesep \linepagesep 5pt\relax
+\def\vfootline{%
+    \begingroup
+    	\rule[-10pt]{0.75pt}{25pt}
+    \endgroup
+}
+\def\header{%
+	\begin{minipage}[]{120pt}
+		\hfill Sascha Kehrli 		% Applicant Name
+    	\par \hfill 				% Formatting boilerplate
+    	CS, PhD, Fall 2025 			% Area, Program, Cycle, Year
+    \end{minipage}
+}
+\fancyhead[RE,LO]{Statement of Purpose | \schoolLong}
+\renewcommand\headrulewidth{0pt}
+
+\begin{document}
+
+%% Why do you wish to attend graduate school? What would you like to study? Keep it broad, details come-in later
+I like to think about Computer Science as a branch of mathematics concerned with the computation of functions, which it refers to \emph{programs}. This perspective frames programs as inherently mathematical objects and invites reasoning about their properties as logical propositions. It is this purity that fascinates me about programming languages and in particular verification. Despite the complexity of modern languages, focusing on a set of properties and analyzing how each language construct affects it is a powerful approach that can be extended to any property in any language, no matter its domain. Driven by this mental model, I pursued research in static verification, where I developed a checker proving the absence of resource leaks in the presence of \emph{collections} of resources.
+
+I am broadly interested in verification -- in particular how programming language abstractions can be leveraged to check any program property. But verification extends to all abstraction layers; how can we create precise specifications of software? How can we model a domain-specific problem in a logic that can be mechanically verified? How can a compiler maintain properties verified about source code?
+
+In my PhD, I aim to gain insights into some of these questions and bring us a step closer to universally verified software.\\
+
+My interests were sparked with an introductory class on \emph{Formal Methods and Functional Programming} and are currently being deepened through graduate classes on \emph{Formal Foundations of Programming Languages} and \emph{Concepts of Object Oriented Programming}. Additionally, some research experiences during my undergraduate degree have significantly shaped these interests, two of which I'd like to highlight here.\\
+
+\textbf{Assessing the Linux Container Abstraction:}
+A deep curiosity about the inner workings of modern
+computer systems, sparked by introductory classes in Operating Systems and Compilers, led me to research in Operating Systems through a graduate class on \emph{Advanced Operating Systems}. As a class project, I assessed the performance isolation of the container abstraction in Linux, which mainly consists of Cgroups. It is well-known that the abstraction is not perfect and a container can perform a DoS attack on the entire kernel. This is why containers are usually only used in a trusted environment (for example within a company), while virtual machines are used if no such assumption can be made. We constructed various realistic workloads that put stress on shared kernel resources, for example the spinlock guarding the shared file descriptor table. Our experiments showed that one container can significantly degrade the performance of other containers running on the same kernel, but on different CPUs, and thus the Linux container abstraction is flawed even in a trusted environment.
+Prof.\ Tom Anderson was so excited by this work that he suggested submitting it to USENIX ATC. However, I wanted to focus on my main interest instead.\\
+
+\textbf{Verifying that collections of resources don't leak:} My current research focuses on formally proving program properties. Specifically, I have designed and implemented a type system that verifies the absence of resource leaks when using \emph{collections} of resources in Java.
+Previous work handles leaks of single resources only, but those techniques do not extend to \emph{collections} of resources. Collections of resources are particularly common in software dealing with connection pools.
+My key insight was that collections of resources are usually homogeneous, meaning that the elements of the collection share the same set of disposal methods and are disposed at the same time. Thus, my approach analyzed loops to determine the set of methods it definitely calls on each collection element.
+A main challenge was to maintain soundness and precision in the presence of aliasing, argument passing, and field writes. Besides tracking aliases intra-procedurally, I came up with an ownership model for collections, which tracks a designated owner through programmer-written annotations. Some key decisions include preventing write-access for non-owning references to resource collections and allowing ownership transfer through corresponding annotations at method returns, parameters and field writes.
+We implemented our solution as a checker in the Java Checker Framework and are currently working on publishing our findings. The project presented not only an intellectual challenge but also a significant engineering hurdle, given the complexity of Java's type system and the demands of deploying the checker within an industrial-strength framework.\\
+
+\textbf{Future Work:}
+I am excited about recent progress in formally verifying software across all parts of the toolchain. A remarkable example is the CompCert compiler, which formally proves the maintenance of semantic equivalence for each compiler pass. CompCert however is not yet a state-of-the-art compiler; the authors self-report a 20\% overhead over gcc and the compiler is considerably smaller in size -- it only has 20 passes, with gcc having an order of magnitude more. The proof of around 100,000 lines of Coq is among the largest produced with any proof assistant and took 6 person-years of effort. This shows that verification still has many fascinating challenges ahead.
+
+At \school, I am particularly excited about the opportunity of working with \profOne and \profTwo, whose research interests align very well with mine. I especially appreciate the FLINT group's work on the verification of systems software, which includes major projects, such as CertiKOS. A recent highlight for me is a paper that extends CompCert and shows that using a quantified Hoare logic, the stack usage bound derived from a C program can be shown to be preserved through compilation. I find this result particularly interesting, since it means that also quantitative properties, as opposed to just semantic ones, can be proved at the source code level. \profTwo's work on synthesis is appealing to me, as software synthesis is a promising idea to solve the problem of coming up with precise specifications. Additionally, \profTwo's work on symbolic execution produced fascinating results, such as that it can be used to find imprecisions in specifications, or that it can be used to prove program equivalence in Haskell, both of which are crucial problems in verification.
+
+I want to pursue my PhD at \school, because I think my goals as a researcher align exceptionally well with its faculty and I would be thrilled to embark on my PhD journey here.
+
+After receiving my PhD, I aspire to continue with my efforts of advancing verification in academia or in an industrial lab.
+
+% Add some blank space between text and references
+\vspace{0.125in}
+\end{document}
