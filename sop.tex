@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{color}
 
 % Linespread command allows you to change line spacing for the entire document
 \linespread{1.18}
@@ -27,6 +28,17 @@
 
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 \newcommand{\Hrule}{\rule{\linewidth}{0.3mm}}
+
+\usepackage{color}
+%%% Todo comments
+%% Comment or uncomment this line.
+% \def\notodocomments{}
+\newcommand{\todo}[1]{{\color{red}\bfseries [[#1]]}}
+% Don't show todo commands if the \notodocomments macro is defined.
+\ifdefined\notodocomments
+  \renewcommand{\todo}[1]{\relax}
+\fi
+
 
 % Project specific macros
 \newcommand{\graphite}{GRAPHITE\xspace}
@@ -65,7 +77,7 @@
 \begin{document}
 
 %% Why do you wish to attend graduate school? What would you like to study? Keep it broad, details come-in later
-I like to think about Computer Science as a branch of mathematics concerned with the computation of functions, which it refers to \emph{programs}. This perspective frames programs as inherently mathematical objects and invites reasoning about their properties as logical propositions. It is this purity that fascinates me about programming languages and, in particular, verification. Driven by this mental model, I pursued research in static verification, where I developed a checker proving the absence of resource leaks in the presence of \emph{collections} of resources.
+I like to think about Computer Science as a branch of mathematics concerned with the computation of functions, which it refers to \emph{programs}. This perspective frames programs as inherently mathematical objects and invites reasoning about their properties as logical propositions. It is this purity that fascinates me about programming languages and, in particular, verification. Driven by this mental model, I pursued research in static verification, where I developed a verifier proving the absence of resource leaks in the presence of \emph{collections} of resources.
 
 I am broadly interested in verification -- in particular how programming language abstractions can be leveraged to construct provably correct software. But verification extends to all abstraction layers; how can we create precise specifications of software? How can we model a domain-specific problem in a logic, such that it can be mechanically verified? How can a compiler maintain properties of source code?
 
@@ -75,14 +87,25 @@ My interests were sparked with an introductory class on \emph{Formal Methods and
 
 \textbf{Assessing the Linux Container Abstraction:}
 A deep curiosity about the inner workings of modern
-computer systems, sparked by introductory classes in Operating Systems and Compilers, led me to research in Operating Systems through a graduate class on \emph{Advanced Operating Systems}. As a class project, I assessed the performance isolation of the container abstraction in Linux, which mainly consists of Cgroups. It is well-known that the abstraction is not perfect and a container can perform a DoS attack on the entire kernel. This is why containers are usually only used in a trusted environment (for example within a company), while virtual machines are used if no such assumption can be made. We constructed various realistic workloads that put stress on shared kernel resources, for example the spinlock guarding the shared file descriptor table. Our experiments showed that one container can significantly degrade the performance of other containers running on the same kernel, but on different CPUs, and thus the Linux container abstraction is flawed even in a trusted environment.
+computer systems, sparked by introductory classes in Operating Systems and Compilers, led me to research in Operating Systems through a graduate class on \emph{Advanced Operating Systems}. As a class project, I assessed the performance isolation of the container abstraction in Linux, which mainly consists of Cgroups. It is well-known that the abstraction is not perfect and a container can perform a DoS attack on the entire kernel.
+\todo{If this is well-known, then how are your observations (which are
+  about performance degradation) a novel contribution?}
+This is why containers are usually only used in a trusted
+environment\todo{What is the definition of ``trusted environment''?}
+(for example within a company), while virtual machines are used if no such assumption can be made.
+\todo{How do virtual machines fix the problem?  Also, I am confused because
+this sentence introduced the notion of virtual machines, but they are not
+discussed again.  The following text returns to containers, so how is this
+sentence about virtual machines relevant?}
+We constructed various realistic workloads that put stress on shared kernel resources, for example the spinlock guarding the shared file descriptor table. Our experiments showed that one container can significantly degrade the performance of other containers running on the same kernel, but on different CPUs, and thus the Linux container abstraction is flawed even in a trusted environment.
 Prof.\ Tom Anderson was so excited by this work that he suggested submitting it to USENIX ATC. However, I wanted to focus on my main interest instead.\\
 
 \textbf{Verifying that collections of resources don't leak:} My current research focuses on formally proving program properties. Specifically, I have designed and implemented a type system that verifies the absence of resource leaks when using \emph{collections} of resources in Java.
-Previous work handles leaks of single resources only, but those techniques do not extend to \emph{collections} of resources. Such collections are particularly common in software dealing with connection pools for example.
-My key insight was that collections of resources are usually homogeneous, meaning that the elements of the collection share the same set of disposal methods and are disposed at the same time. Thus, my approach analyzed loops to determine the set of methods it definitely calls on each collection element. This allows detecting
+Previous work handles leaks of single resources only, but collections are common in software dealing with connection pools, for example.
+My key insight was that collections of resources are usually homogeneous, meaning that the elements of the collection share the same set of disposal methods and are disposed at the same time. My approach analyzed each loop to determine the set of methods it definitely calls on each collection element. 
+\todo{Sentence fragment:}This allows detecting
 A main challenge was to maintain soundness and precision in the presence of aliasing, argument passing, and field writes. Besides tracking aliases intra-procedurally, I came up with an ownership model for collections, which tracks a designated owner through programmer-written annotations. Some key decisions include preventing write-access for non-owning references to resource collections and allowing ownership transfer through corresponding annotations at method returns, parameters and field writes.
-We implemented our solution as a checker in the Java Checker Framework and are currently working on publishing our findings. The project presented not only an intellectual challenge but also a significant engineering hurdle, given the complexity of Java's type system and the demands of deploying the checker within an industrial-strength framework.\\
+We implemented our solution as a checker in the Java Checker Framework and are currently writing up our findings for publication. The project presented not only an intellectual challenge but also a significant engineering hurdle, given the complexity of Java's type system and the demands of deploying the checker within an industrial-strength framework.\\
 
 \textbf{Future Work:}
 I am excited about recent progress in formally verifying software across all parts of the toolchain. A remarkable example is the CompCert compiler, which formally proves the maintenance of semantic equivalence for each compiler pass. CompCert however is not yet a state-of-the-art compiler; the authors self-report a 20\% overhead over gcc and the compiler is considerably smaller in size -- it only has 20 passes, with gcc having an order of magnitude more. The proof of around 100,000 lines of Coq is among the largest produced with any proof assistant and took 6 person-years of effort. This shows that verification still has many fascinating challenges ahead.
